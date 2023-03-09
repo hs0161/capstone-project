@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css"/>
+    <title>Timely</title>
+</head>
+<body>
+    <div class = "container">
+        <div class="left">
+            <div class="calendar">
+                <div class="month">
+                    <span class="month-prev" id="month-prev"><</span>
+                    <div class="date"></div>
+                    <span class="month-next" id="month-next">></span>
+                </div>
+                <div class="weekdays">
+                    <div>SUN</div>
+                    <div>MON</div>
+                    <div>TUE</div>
+                    <div>WED</div>
+                    <div>THU</div>
+                    <div>FRI</div>
+                    <div>SAT</div>
+                </div>
+                <div class="calendar-days">
+                </div>
+                <div class="goto-today">
+                    <div class="date-format">08 - march - 2023</div>
+                    <div class="time-format">09:54:20</div>
+                    <div class="goto">
+                        <input type="text" placeholder="mm/yyyy" class="date-input" id="date-input">
+                        <button class="goto-btn">go</button>
+                    </div>
+                    <button class="today-btn">today</button>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="today-date">
+                <div class="event-day">MON</div>
+                <div class="event-date">07 MARCH 2023</div>
+            </div>
+            <div class="events">                  
+            </div>
+            <div class="add-event-wrapper">
+                <div class="add-event-header">
+                    <div class="title">Add Event</div>
+                    <pre class="close">&#10005</pre>
+                </div>
+                <div class="add-event-body">
+                    <div class="add-event-input">
+                        <input type="text" placeholder="Event Name" class="event-name" />
+                    </div>
+                    <div class="add-event-input">
+                        <input type="text" placeholder="Event Time From" class="event-time-from" />
+                    </div>
+                    <div class="add-event-input">
+                        <input type="text" placeholder="Event Time To" class="event-time-to" />
+                    </div>
+                </div>
+                <div class="add-event-footer">
+                    <button class="add-event-btn">add event</button>
+                </div>
+            </div>
+        </div>
+        <button class="add-event">&plus;</button>
+    </div>
+    
+    <script src="server.js"></script> 
+    <script src="script.js"></script>
+</body>
+</html>
