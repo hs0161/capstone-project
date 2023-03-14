@@ -285,6 +285,7 @@ function updateEvents (date) {
             month + 1 === event.month &&
             year === event.year
         ) {
+            console.log('event', event)
             //show event on document
             event.events.forEach((event) => {
                 events += `
@@ -294,7 +295,7 @@ function updateEvents (date) {
                         <h3 class="event-title">${event.title}</h3>
                     </div>
                     <div class="event-time">
-                        <span class="event-time">${event.time}</span>
+                        <span class="event-time">${makeDatePretty(event.date_from)} - ${makeDatePretty(event.date_to)}</span>
                     </div>
                 </div>
             `;
@@ -309,6 +310,25 @@ function updateEvents (date) {
     }
     eventContainer.innerHTML = events;
 };
+
+// function to convert ugly ass timestamp to something nice
+// function makeDatePretty(timestamp) {
+//     const timestampDate = new Date(timestamp.substring(0,timestamp.length-1) + '-05:00')
+//     return `${timestampDate.get.getHours()}:${timestampDate.getUTCMinutes()}`
+// }
+
+function makeDatePretty(timestamp) {
+    const timestampDate = new Date(timestamp)
+    let pm = timestampDate.getHours() >= 12;
+    let hour12 = (timestampDate.getHours() - 6) % 12;
+    if (!hour12)
+        hour12 += 12;
+    let minute = timestampDate.getMinutes();
+    return `${hour12}:${minute} ${pm ? 'pm' : 'am'}`
+}
+
+
+
 //function to add events
 addEventSubmit.addEventListener("click", () => {
     const eventTitle = addEventTitle.value;
