@@ -33,10 +33,42 @@ const months = [
 ];
 
 let eventsArr = [];
-// getEvents();
+function getEvents() {
+    return fetch('http://localhost:3001/events', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
+      .then(response => response.json())
+      .catch(error => {
+        console.error('Error saving event on server:', error);
+      });
+};
 
+getEvents().then(events => {
+    events.forEach(event => {
+        const date = new Date(event.date_from);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const day = date.getDate();
 
-//function to add days
+        const eventDay = eventsArr.find(item => item.year === year && item.month === month + 1 && item.day === day);
+
+        if (eventDay) {
+            eventDay.events.push(event);
+        } else {
+            eventsArr.push({
+                year,
+                month: month + 1,
+                day,
+                events: [event]
+            })
+        }
+    })
+    updateEvents((new Date()).getDate());
+});
+
 function initCalendar() {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -49,14 +81,10 @@ function initCalendar() {
     date.innerHTML = months[month] + " " + year;
 
     let days = "";
-
     for (let x = day; x > 0; x--){
         days += `<div class="day prev-date">${prevDays - x + 1}</div>`;
     }
-
     for (let i = 1; i <= lastDate; i++) {
-        //check if event present on current day
-
         let event = false;
         eventsArr.forEach((eventObj) => {
             if(
@@ -65,12 +93,9 @@ function initCalendar() {
                 eventObj.year === year
             )
             {
-                //if event found
                 event = true;
             }
         });
-
-
         if(
             i === new Date().getDate() && 
             year === new Date().getFullYear() && 
@@ -79,9 +104,6 @@ function initCalendar() {
             activeDay = i;
             getActiveDay(i);
             updateEvents(i);
-
-            //if event found also add event class
-            //add active on today at startup
             if(event) {
                 days += `<div class="day today active event" >${i}</div>`;
             } else {
@@ -95,19 +117,14 @@ function initCalendar() {
             }
         }
     }
-
     for (let j = 1; j <= nextDays; j++) {
         days += `<div class="day next-date" >${j}</div>`;
     }
-
     daysContainer.innerHTML = days;
-    //add listenr after calendar initialized
     addEventListener();
 }
-
 initCalendar();
 
-//previous months
 function prevMonth() {
     month--;
     if (month < 0) {
@@ -115,9 +132,7 @@ function prevMonth() {
         year--;
     }
     initCalendar();
-}
-
-//next months
+};
 function nextMonth() {
     month++;
     if (month > 11) {
@@ -125,20 +140,16 @@ function nextMonth() {
         year++;
     }
     initCalendar();
-}
+};
 
-//eventlisteners for prev & next months
 prev.addEventListener("click", prevMonth);
 next.addEventListener("click", nextMonth);
-
-//go to date and today functions
 todayBtn.addEventListener("click", () => {
     today = new Date();
     month = today.getMonth();
     year = today.getFullYear();
     initCalendar();
 });
-
 dateInput.addEventListener("input" , (e) => {
     dateInput.value = dateInput.value.replace(/[^0-9/]/g, "");
     if (dateInput.value.length === 2) {
@@ -155,8 +166,6 @@ dateInput.addEventListener("input" , (e) => {
 });
 
 goToBtn.addEventListener("click", gotoDate);
-
-//function to go to date entered
 function gotoDate() {
     const dateArr = dateInput.value.split("/");
     if (dateArr.length === 2) {
@@ -166,17 +175,16 @@ function gotoDate() {
             initCalendar();
             return;
         }
-    }
-    //if invalid date entered
+    };
+
     alert("Invalid date. Please enter in the correct format.");
-    
     goToBtn.addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
             event.preventDefault();
             goToBtn.addEventListener("click", gotoDate);        
         }
     });
-}
+};
 
 const addEventBtn = document.querySelector(".add-event"),
     addEventContainer = document.querySelector(".add-event-wrapper"),
@@ -202,16 +210,11 @@ addEventTitle.addEventListener("input", (e) => {
     addEventTitle.value = addEventTitle.value.slice(0, 50);
 });
 
-
-
-//time format in from & to
 addEventFrom.addEventListener("input", (e) => {
     addEventFrom.value = addEventFrom.value.replace(/[^0-9:]/g , "");
-//if 2 numbers is entered auto add
     if(addEventFrom.value.length === 2) {
         addEventFrom.value += ":";
     }
-    //don't let use enter more than 5 characters
     if(addEventFrom.value.length > 5) {
         addEventFrom.value = addEventFrom.value.slice(0, 5)
     }
@@ -226,31 +229,20 @@ addEventTo.addEventListener("input", (e) => {
     }
 });
 
-//function to add listener on days after rendered
 function addEventListener() {
     const days = document.querySelectorAll(".day");
     days.forEach((day) => {
         day.addEventListener("click", (e) => {
             activeDay = Number(e.target.innerHTML);
-
-            //call active day after click
             getActiveDay(e.target.innerHTML);
             updateEvents(Number(e.target.innerHTML));
-
-            //remove active from already active day
-
             days.forEach((day) => {
                 day.classList.remove("active");
             });
-
-            //if previous month day clicked go to previous month and add active 
             if(e.target.classList.contains("prev-date")) {
                 prevMonth();
-
                 setTimeout(() => {
-                    const days = document.querySelectorAll(".day");
-                    
-                    //after going to previous month add active to clicked 
+                    const days = document.querySelecftorAll(".day");
                     days.forEach((day) => {
                         if(!day.classList.contains("prev-date") && day.innerHTML === e.target.innerHTML) {
                             day.classList.add("active");
@@ -260,10 +252,8 @@ function addEventListener() {
                 //same thing with next month days
             } else if(e.target.classList.contains("next-date")) {
                 nextMonth();
-
                 setTimeout(() => {
                     const days = document.querySelectorAll(".day");
-                    
                     //after going to previous month add active to clicked 
                     days.forEach((day) => {
                         if(!day.classList.contains("next-date") && day.innerHTML === e.target.innerHTML) {
@@ -277,22 +267,19 @@ function addEventListener() {
             }
         });
     })
-}
-
+};
 //show active day events and date at top
-
 function getActiveDay (date){
     const day = new Date(year , month , date);
     const dayName = day.toString().split(" ")[0];
     eventDay.innerHTML = dayName;
     eventDate.innerHTML = date + " " + months[month] + " " + year;
-}
-
+};
 //function to show events of chosen day
 function updateEvents (date) {
     let events = "";
     eventsArr.forEach((event) => {
-        //get events of active day only
+        // get events of active day only
         if(
             date === event.day &&
             month + 1 === event.month &&
@@ -314,7 +301,6 @@ function updateEvents (date) {
             });
         }
     });
-
     //if nothing found
     if(events === "") {
         events = `<div class="no-event">
@@ -322,11 +308,7 @@ function updateEvents (date) {
                   </div>`;
     }
     eventContainer.innerHTML = events;
-
-    //save events when new one added
-    saveEvents();
-}
-
+};
 //function to add events
 addEventSubmit.addEventListener("click", () => {
     const eventTitle = addEventTitle.value;
@@ -337,10 +319,8 @@ addEventSubmit.addEventListener("click", () => {
         alert("Please fill all fields");
         return;
     }
-
     const timeFromArr = eventTimeFrom.split(":");
     const timeToArr = eventTimeTo.split(":");
-
     if (
         timeFromArr.length != 2 || 
         timeToArr.length != 2 ||
@@ -351,15 +331,13 @@ addEventSubmit.addEventListener("click", () => {
     ) {
         alert ("Invalid Time Format");
     }
-
     const timeFrom = convertTime(eventTimeFrom);
     const timeTo = convertTime(eventTimeTo);
-
     const newEvent = {
-        title : eventTitle, 
-        time : timeFrom + " - " + timeTo,
+        title : eventTitle,
+        dateFrom: new Date(eventDate.innerHTML + " " + timeFrom),
+        dateTo: new Date(eventDate.innerHTML + " " + timeTo)
     };
-
       //check if event is already added
     let eventExist = false;
     eventsArr.forEach((event) => {
@@ -379,12 +357,13 @@ addEventSubmit.addEventListener("click", () => {
     if (eventExist) {
         alert("Event already added");
     return;
-    }
+    };
 
-  console.log(newEvent);
-  console.log(activeDay);
+  console.log('eventDate', eventDate.innerHTML);
+  console.log('new event', newEvent);
+  console.log('active day',activeDay);
     let eventAdded = false;
-
+    saveEvent(newEvent)
     if(eventsArr.length > 0) {
         eventsArr.forEach((item) => {
             if(
@@ -396,8 +375,7 @@ addEventSubmit.addEventListener("click", () => {
                 eventAdded = true;
             }
         });
-    }
-
+    };
     //if event array empty or current day has no event create new one
     if(!eventAdded) {
         eventsArr.push({
@@ -406,22 +384,19 @@ addEventSubmit.addEventListener("click", () => {
             year: year,
             events: [newEvent],
         });
-    }
+    };
     //remove active from add event form
     addEventContainer.classList.remove("active");
     //clear the fields
     addEventTitle.value = "";
     addEventFrom.value = "";
     addEventTo.value = "";
-
     //show current added event
     updateEvents(activeDay);
-
     const activeDayElem = document.querySelector(".day.active");
     if(!activeDayElem.classList.contains("event")) {
         activeDayElem.classList.add("event");
-    }
-
+    };
 });
 
 function convertTime(time) {
@@ -432,7 +407,7 @@ function convertTime(time) {
     timeHour = timeHour % 12 || 12;
     time = timeHour + ":" + timeMin + " " + timeFormat;
     return time;
-}
+};
 
 //function to remove events on click
 eventContainer.addEventListener("click" , (e) => {
@@ -467,50 +442,36 @@ eventContainer.addEventListener("click" , (e) => {
     }
 });
 
-//store events in local storage
-
-// function saveEvents() {
-//     localStorage.setItem("events" , JSON.stringify(eventsArr));
-// }
-
-// function getEvents() {
-//     if(localStorage.getItem("events" === null)) {
-//         return;
-//     }
-
-//     eventsArr.push(...JSON.parse(localStorage.getItem("events")));
-// }
-
-function saveEvents() {
-    fetch('/events', {
+function saveEvent(eventsData) {
+    console.log(`EVENTS DATA ${JSON.stringify(eventsData)}`)
+    fetch('http://localhost:3001/events', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(eventsArr)
+      body: JSON.stringify(eventsData)
+    })
+    .then(response => response.json())
+    .then(newEvent => {
+      console.log('New event saved on server:', newEvent);
+    })
+    .catch(error => {
+      console.error('Error saving event on server:', error);
     });
-  }
-  
-  async function getEvents() {
-    const response = await fetch('/events');
-    eventsArr = await response.json();
-  }
+  };
 
 const todayShowTime = document.querySelector('.time-format');
 const todayShowDate = document.querySelector('.date-format');
-
 const currShowDate = new Date();
 const showCurrDateOption = {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
 };
-
 const currentDateFormat = new Intl.DateTimeFormat(
     'en-US',
     showCurrDateOption
 ).format(currShowDate);
-
 todayShowDate.textContent = currentDateFormat;
 setInterval(() => {
     const timer = new Date();
@@ -519,14 +480,7 @@ setInterval(() => {
         minute: 'numeric',
         second: 'numeric',
     };
-
     const formatTimer = new Intl.DateTimeFormat('en-us', option).format(timer);
-    let time = `${`${timer.getHours()}`.padStart(
-        2,
-        '0'
-    )}:${`${timer.getMinutes()}`.padStart(
-        2,
-        '0'
-    )}:${`${timer.getSeconds()}`.padStart(2, '0')}`;
+    let time = `${`${timer.getHours()}`.padStart(2, '0')}:${`${timer.getMinutes()}`.padStart(2, '0')}:${`${timer.getSeconds()}`.padStart(2, '0')}`;
     todayShowTime.textContent = formatTimer;
 }, 1000);

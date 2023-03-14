@@ -263,6 +263,7 @@ body {
 .date-format, .time-format {
     color: #878895;
     font-weight: 700;
+    font-size: 1rem;
     text-transform: uppercase;
 }
 
