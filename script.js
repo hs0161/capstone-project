@@ -311,12 +311,6 @@ function updateEvents (date) {
     eventContainer.innerHTML = events;
 };
 
-// function to convert ugly ass timestamp to something nice
-// function makeDatePretty(timestamp) {
-//     const timestampDate = new Date(timestamp.substring(0,timestamp.length-1) + '-05:00')
-//     return `${timestampDate.get.getHours()}:${timestampDate.getUTCMinutes()}`
-// }
-
 function makeDatePretty(timestamp) {
     const timestampDate = new Date(timestamp)
     let pm = timestampDate.getHours() >= 12;
@@ -327,9 +321,6 @@ function makeDatePretty(timestamp) {
     return `${hour12}:${minute} ${pm ? 'pm' : 'am'}`
 }
 
-
-
-//function to add events
 addEventSubmit.addEventListener("click", () => {
     const eventTitle = addEventTitle.value;
     const eventTimeFrom = addEventFrom.value;
@@ -358,7 +349,7 @@ addEventSubmit.addEventListener("click", () => {
         dateFrom: new Date(eventDate.innerHTML + " " + timeFrom),
         dateTo: new Date(eventDate.innerHTML + " " + timeTo)
     };
-      //check if event is already added
+
     let eventExist = false;
     eventsArr.forEach((event) => {
         if (
@@ -396,7 +387,7 @@ addEventSubmit.addEventListener("click", () => {
             }
         });
     };
-    //if event array empty or current day has no event create new one
+
     if(!eventAdded) {
         eventsArr.push({
             day: activeDay,
@@ -405,13 +396,12 @@ addEventSubmit.addEventListener("click", () => {
             events: [newEvent],
         });
     };
-    //remove active from add event form
+
     addEventContainer.classList.remove("active");
-    //clear the fields
     addEventTitle.value = "";
     addEventFrom.value = "";
     addEventTo.value = "";
-    //show current added event
+
     updateEvents(activeDay);
     const activeDayElem = document.querySelector(".day.active");
     if(!activeDayElem.classList.contains("event")) {
@@ -445,10 +435,8 @@ eventContainer.addEventListener("click" , (e) => {
                         event.events.splice(index, 1);
                     }
                 });
-                //if no event remains on the day remove complete day
                 if(event.events.length === 0) {
                     eventsArr.splice(eventsArr.indexOf(event) , 1);
-                    //after remove complete day also remove active class of that day
                     const activeDayElem = document.querySelector(".day.active")
                     if(activeDayElem.classList.contains("event")) {
                         activeDayElem.classList.remove("event");
@@ -456,11 +444,26 @@ eventContainer.addEventListener("click" , (e) => {
                 }
             }
         });
-        //after removing from array update event
+        eventContainer.remove();
         updateEvents(activeDay);
         }
     }
 });
+
+function deleteEvent(eventsData) {
+    fetch(`http://localhost:3001/events/${eventsData}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        console.log(`Event with ID ${eventsData} deleted from server.`);
+    })
+    .catch(error => {
+        console.error(`Error deleting event with ID ${eventsData} on server:`, error);
+    });
+};
 
 function saveEvent(eventsData) {
     console.log(`EVENTS DATA ${JSON.stringify(eventsData)}`)
@@ -493,6 +496,7 @@ const currentDateFormat = new Intl.DateTimeFormat(
     showCurrDateOption
 ).format(currShowDate);
 todayShowDate.textContent = currentDateFormat;
+
 setInterval(() => {
     const timer = new Date();
     const option = {
